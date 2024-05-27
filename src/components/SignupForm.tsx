@@ -13,19 +13,29 @@ const passwordSchema = z
   .regex(/[0-9]/, { message: 'At least one number' })
   .regex(/[#?!@$%^&*-]/, { message: 'At least one special character' });
 
-export default function LoginForm() {
+export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
+      passwordConfirmation: '',
+    },
+    validators: {
+      onChange({ value }) {
+        if (value.password !== value.passwordConfirmation) {
+          return 'Passwords do not match';
+        }
+        return undefined;
+      },
     },
     onSubmit: async ({ value }) => {
       // TODO: form data to Firebase
       console.log(value);
     },
   });
+  const formErrorMap = form.useStore((state) => state.errorMap);
 
   return (
     <div className="mx-auto flex w-1/3 flex-col gap-4">
@@ -69,7 +79,18 @@ export default function LoginForm() {
             validators={{ onChange: passwordSchema }}
             children={(field) => (
               <>
-                <label htmlFor="password">Your Password</label>
+                <span className="flex justify-between">
+                  <label htmlFor="password">Create Password</label>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={showPassword}
+                      onChange={() => setShowPassword(!showPassword)}
+                    />{' '}
+                    Show Password
+                  </label>
+                </span>
+
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name={field.name}
@@ -79,23 +100,36 @@ export default function LoginForm() {
                   className="border bg-gray-50 p-2"
                   placeholder="••••••••"
                 />
-                <span className="flex justify-between">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={showPassword}
-                      onChange={() => setShowPassword(!showPassword)}
-                    />{' '}
-                    Show Password
-                  </label>
-                  <a className="cursor-pointer font-bold hover:underline">
-                    Forgot password?
-                  </a>
-                </span>
 
                 {field.state.meta.errors ? (
                   <em role="alert" className="text-orange-800">
                     {field.state.meta.errors.join(', ')}
+                  </em>
+                ) : null}
+              </>
+            )}
+          />
+        </div>
+        <div className="mb-3 flex flex-col">
+          <form.Field
+            name="passwordConfirmation"
+            validatorAdapter={zodValidator}
+            validators={{ onChange: passwordSchema }}
+            children={(field) => (
+              <>
+                <label htmlFor="passwordConfirmation">Confirm Password</label>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="border bg-gray-50 p-2"
+                  placeholder="••••••••"
+                />
+                {formErrorMap.onChange ? (
+                  <em role="alert" className="text-orange-800">
+                    {formErrorMap.onChange}
                   </em>
                 ) : null}
               </>
@@ -114,4 +148,4 @@ export default function LoginForm() {
 }
 
 const rootElement = document.getElementById('root')!;
-ReactDOM.createRoot(rootElement).render(<LoginForm />);
+ReactDOM.createRoot(rootElement).render(<SignupForm />);

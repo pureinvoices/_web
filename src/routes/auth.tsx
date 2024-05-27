@@ -1,14 +1,30 @@
-import LoginForm from '@/components/LoginForm';
+import { useState } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import LoginForm from '@/components/LoginForm';
+import SignupForm from '@/components/SignupForm';
 
 export const Route = createFileRoute('/auth')({
   component: Auth,
 });
 
 function Auth() {
+  const [isLogin, setIsLogin] = useState(true);
+
   return (
-    <div className="flex p-2">
-      <LoginForm />
+    <div className="flex flex-col gap-4 p-2">
+      {isLogin ? <LoginForm /> : <SignupForm />}
+      <div className="mx-auto flex w-1/3">
+        <p className="font-light text-gray-500">
+          {isLogin ? "Don't have an account yet?" : 'Already have an account?'}{' '}
+          <button
+            type="button"
+            className="font-semibold hover:underline"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? 'Sign up' : 'Login'}
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
