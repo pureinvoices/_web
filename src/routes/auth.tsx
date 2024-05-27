@@ -1,3 +1,4 @@
+import AuthForm from '@/components/AuthForm';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/auth')({
@@ -6,8 +7,8 @@ export const Route = createFileRoute('/auth')({
 
 function Auth() {
   return (
-    <div className="p-2">
-      <h3>Auth Page</h3>
+    <div className="flex p-2">
+      <AuthForm />
     </div>
   );
 }
