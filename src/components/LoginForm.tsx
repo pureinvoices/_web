@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { auth } from '../utils/firebase';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 
@@ -14,6 +16,8 @@ const passwordSchema = z
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [signInWithEmailAndPassword, , , error] =
+    useSignInWithEmailAndPassword(auth);
 
   const form = useForm({
     defaultValues: {
@@ -21,8 +25,8 @@ export default function LoginForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      // TODO: form data to Firebase
-      console.log(value);
+      signInWithEmailAndPassword(value.email, value.password);
+      console.log('logged in!');
     },
   });
 
@@ -114,6 +118,15 @@ export default function LoginForm() {
           )}
         />
       </form>
+      {error && (
+        <div>
+          <em className="text-orange-800">
+            {error.message.includes('auth/invalid-credential')
+              ? 'Invalid email or password. Please, try again.'
+              : `Error: ${error.message}`}
+          </em>
+        </div>
+      )}
     </div>
   );
 }

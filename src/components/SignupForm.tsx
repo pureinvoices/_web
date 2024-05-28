@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { auth } from '../utils/firebase';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 
@@ -14,6 +16,8 @@ const passwordSchema = z
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [createUserWithEmailAndPassword, , , error] =
+    useCreateUserWithEmailAndPassword(auth);
 
   const form = useForm({
     defaultValues: {
@@ -22,8 +26,10 @@ export default function SignupForm() {
       password_confirm: '',
     },
     onSubmit: async ({ value }) => {
-      // TODO: form data to Firebase
-      console.log(value);
+      if (value.password === value.password_confirm) {
+        createUserWithEmailAndPassword(value.email, value.password);
+      }
+      console.log('signed up!');
     },
   });
 
@@ -146,6 +152,15 @@ export default function SignupForm() {
           )}
         />
       </form>
+      {error && (
+        <div>
+          <em className="text-orange-800">
+            {error.message.includes('auth/email-already-in-use')
+              ? 'This email is already in use. Please try logging in instead.'
+              : `Error: ${error.message}`}
+          </em>
+        </div>
+      )}
     </div>
   );
 }
