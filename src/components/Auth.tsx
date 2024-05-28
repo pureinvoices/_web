@@ -1,11 +1,6 @@
 import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
 import LoginForm from '@/components/LoginForm';
 import SignupForm from '@/components/SignupForm';
-
-export const Route = createFileRoute('/auth')({
-  component: Auth,
-});
 
 function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,3 +23,5 @@ function Auth() {
     </div>
   );
 }
+
+export default Auth;
