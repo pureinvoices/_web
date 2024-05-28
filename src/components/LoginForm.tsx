@@ -101,12 +101,18 @@ export default function LoginForm() {
             )}
           />
         </div>
-        <button
-          type="submit"
-          className="w-full bg-gray-200 py-2 hover:bg-gray-300"
-        >
-          Submit
-        </button>
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <button
+              type="submit"
+              disabled={!canSubmit}
+              className={`w-full bg-gray-200 py-2 ${isSubmitting ? '' : 'hover:bg-gray-300'}`}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
+          )}
+        />
       </form>
     </div>
   );
