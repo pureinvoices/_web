@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import { useForm } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
@@ -112,6 +111,3 @@ export default function LoginForm() {
     </div>
   );
 }
-
-const rootElement = document.getElementById('root')!;
-ReactDOM.createRoot(rootElement).render(<LoginForm />);
