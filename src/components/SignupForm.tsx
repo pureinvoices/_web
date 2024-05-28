@@ -19,22 +19,13 @@ export default function SignupForm() {
     defaultValues: {
       email: '',
       password: '',
-      passwordConfirmation: '',
-    },
-    validators: {
-      onChange({ value }) {
-        if (value.password !== value.passwordConfirmation) {
-          return 'Passwords do not match';
-        }
-        return undefined;
-      },
+      password_confirm: '',
     },
     onSubmit: async ({ value }) => {
       // TODO: form data to Firebase
       console.log(value);
     },
   });
-  const formErrorMap = form.useStore((state) => state.errorMap);
 
   return (
     <div className="mx-auto flex w-1/3 flex-col gap-4">
@@ -111,12 +102,19 @@ export default function SignupForm() {
         </div>
         <div className="mb-3 flex flex-col">
           <form.Field
-            name="passwordConfirmation"
-            validatorAdapter={zodValidator}
-            validators={{ onChange: passwordSchema }}
+            name="password_confirm"
+            validators={{
+              onChangeListenTo: ['password'],
+              onChange: ({ value, fieldApi }) => {
+                if (value !== fieldApi.form.getFieldValue('password')) {
+                  return 'Passwords do not match';
+                }
+                return undefined;
+              },
+            }}
             children={(field) => (
               <>
-                <label htmlFor="passwordConfirmation">Confirm Password</label>
+                <label htmlFor="password_confirm">Confirm Password</label>
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name={field.name}
@@ -126,9 +124,9 @@ export default function SignupForm() {
                   className="border bg-gray-50 p-2"
                   placeholder="••••••••"
                 />
-                {formErrorMap.onChange ? (
+                {field.state.meta.errors ? (
                   <em role="alert" className="text-orange-800">
-                    {formErrorMap.onChange}
+                    {field.state.meta.errors.join(', ')}
                   </em>
                 ) : null}
               </>
