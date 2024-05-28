@@ -32,19 +32,22 @@ function Navbar({ user }: NavbarProps) {
         </div>
       </div>
 
-      <div>
+      <div className="flex gap-4">
         {user && (
-          <button
-            className="font-bold"
-            onClick={async () => {
-              const success = await signOut();
-              if (success) {
-                console.log('logged out');
-              }
-            }}
-          >
-            logout
-          </button>
+          <>
+            <p>current user: {user.email}</p>
+            <button
+              className="font-bold"
+              onClick={async () => {
+                const success = await signOut();
+                if (success) {
+                  console.log('logged out');
+                }
+              }}
+            >
+              logout
+            </button>
+          </>
         )}
       </div>
     </div>

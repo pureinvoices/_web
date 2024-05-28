@@ -29,7 +29,6 @@ export default function SignupForm() {
       if (value.password === value.password_confirm) {
         createUserWithEmailAndPassword(value.email, value.password);
       }
-      console.log('signed up!');
     },
   });
 

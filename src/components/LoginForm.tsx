@@ -26,7 +26,6 @@ export default function LoginForm() {
     },
     onSubmit: async ({ value }) => {
       signInWithEmailAndPassword(value.email, value.password);
-      console.log('logged in!');
     },
   });
 
