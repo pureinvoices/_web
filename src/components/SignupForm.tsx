@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '../utils/firebase';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 
 const emailSchema = z.string().email({ message: 'Invalid email address' });
 const passwordSchema = z
@@ -27,7 +27,12 @@ export default function SignupForm() {
     },
     onSubmit: async ({ value }) => {
       if (value.password === value.password_confirm) {
-        createUserWithEmailAndPassword(value.email, value.password);
+        try {
+          await createUserWithEmailAndPassword(value.email, value.password);
+        } catch (error) {
+          console.error('Error creating new account:', error);
+        }
+        form.reset();
       }
     },
   });

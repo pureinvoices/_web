@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '../utils/firebase';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
+import {
+  useSignInWithEmailAndPassword,
+  useSendPasswordResetEmail,
+} from 'react-firebase-hooks/auth';
 
 const emailSchema = z.string().email({ message: 'Invalid email address' });
-const passwordSchema = z
-  .string()
-  .min(8, { message: 'At least 8 characters' })
-  .regex(/[A-Z]/, { message: 'At least one uppercase letter' })
-  .regex(/[a-z]/, { message: 'At least one lowercase letter' })
-  .regex(/[0-9]/, { message: 'At least one number' })
-  .regex(/[#?!@$%^&*-]/, { message: 'At least one special character' });
+const passwordSchema = z.string().min(1, { message: 'Invalid password' });
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPass, setIsForgotPass] = useState(false);
+  const [passEmailSent, setPassEmailSent] = useState(false);
+  const [sendPasswordResetEmail] = useSendPasswordResetEmail(auth);
   const [signInWithEmailAndPassword, , , error] =
     useSignInWithEmailAndPassword(auth);
 
@@ -25,12 +25,26 @@ export default function LoginForm() {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      signInWithEmailAndPassword(value.email, value.password);
+      if (isForgotPass) {
+        try {
+          await sendPasswordResetEmail(value.email);
+          setPassEmailSent(true);
+        } catch (error) {
+          console.error('Error sending password reset email:', error);
+        }
+      } else {
+        try {
+          await signInWithEmailAndPassword(value.email, value.password);
+        } catch (error) {
+          console.error('Error signing in:', error);
+        }
+      }
+      form.reset();
     },
   });
 
   return (
-    <div className="mx-auto flex w-1/3 flex-col gap-4">
+    <div className="mx-auto flex flex-col gap-4 md:w-1/3">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -63,47 +77,52 @@ export default function LoginForm() {
               </>
             )}
           />
+          {passEmailSent && isForgotPass && (
+            <p className="font-semibold text-green-800">
+              An email has been sent with instructions to reset your password.
+              Please check your inbox.
+            </p>
+          )}
         </div>
-        <div className="mb-3 flex flex-col">
-          <form.Field
-            name="password"
-            validatorAdapter={zodValidator}
-            validators={{ onChange: passwordSchema }}
-            children={(field) => (
-              <>
-                <label htmlFor="password">Your Password</label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className="border bg-gray-50 p-2"
-                  placeholder="••••••••"
-                />
-                <span className="flex justify-between">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={showPassword}
-                      onChange={() => setShowPassword(!showPassword)}
-                    />{' '}
-                    Show Password
-                  </label>
-                  <a className="cursor-pointer font-bold hover:underline">
-                    Forgot password?
-                  </a>
-                </span>
+        {!isForgotPass && (
+          <div className="mb-3 flex flex-col">
+            <form.Field
+              name="password"
+              validatorAdapter={zodValidator}
+              validators={{ onChange: passwordSchema }}
+              children={(field) => (
+                <>
+                  <label htmlFor="password">Your Password</label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    className="border bg-gray-50 p-2"
+                    placeholder="••••••••"
+                  />
+                  <span className="flex justify-between">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={showPassword}
+                        onChange={() => setShowPassword(!showPassword)}
+                      />{' '}
+                      Show Password
+                    </label>
+                  </span>
 
-                {field.state.meta.errors ? (
-                  <em role="alert" className="text-orange-800">
-                    {field.state.meta.errors.join(', ')}
-                  </em>
-                ) : null}
-              </>
-            )}
-          />
-        </div>
+                  {field.state.meta.errors ? (
+                    <em role="alert" className="text-orange-800">
+                      {field.state.meta.errors.join(', ')}
+                    </em>
+                  ) : null}
+                </>
+              )}
+            />
+          </div>
+        )}
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
@@ -117,6 +136,18 @@ export default function LoginForm() {
           )}
         />
       </form>
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => {
+            setIsForgotPass(!isForgotPass);
+            setPassEmailSent(false);
+          }}
+          className="font-bold hover:underline"
+        >
+          {isForgotPass ? 'Login' : 'Forgot password?'}
+        </button>
+      </div>
       {error && (
         <div>
           <em className="text-orange-800">
