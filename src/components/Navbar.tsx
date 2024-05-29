@@ -1,10 +1,9 @@
 import { Link } from '@tanstack/react-router';
-import logo from '../assets/inline-black.png';
 import { auth } from '@/utils/firebase';
-import { useSignOut } from 'react-firebase-hooks/auth';
 import { User } from 'firebase/auth';
-
-const routes = ['Home', 'Profile', 'Clients', 'Items', 'Invoices'];
+import { useSignOut } from 'react-firebase-hooks/auth';
+import NavMenu from './NavMenu';
+import logo from '../assets/inline-black.png';
 
 interface NavbarProps {
   user: User | null;
@@ -14,22 +13,12 @@ function Navbar({ user }: NavbarProps) {
   const [signOut] = useSignOut(auth);
 
   return (
-    <div className="flex items-center justify-between gap-2 px-2 py-5">
+    <div className="flex items-center justify-between gap-2 px-2 py-4">
       <div className="flex items-center gap-10">
         <Link to="/">
           <img src={logo} alt="Pure invoices logo" className="h-8" />
         </Link>
-        <div className="flex gap-3">
-          {routes.map((route) => (
-            <Link
-              key={route}
-              to={route === 'Home' ? '/' : `/${route.toLowerCase()}`}
-              className="[&.active]:font-bold"
-            >
-              {route}
-            </Link>
-          ))}
-        </div>
+        {user && <NavMenu />}
       </div>
 
       <div className="flex gap-4">

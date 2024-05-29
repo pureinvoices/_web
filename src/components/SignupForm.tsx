@@ -16,8 +16,16 @@ const passwordSchema = z
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const actionCodeSettings = {
+    url: import.meta.env.VITE_EMAIL_CONFIRMED,
+    handleCodeInApp: true,
+  };
+
   const [createUserWithEmailAndPassword, , , error] =
-    useCreateUserWithEmailAndPassword(auth);
+    useCreateUserWithEmailAndPassword(auth, {
+      sendEmailVerification: true,
+      emailVerificationOptions: actionCodeSettings,
+    });
 
   const form = useForm({
     defaultValues: {

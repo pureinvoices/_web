@@ -4,6 +4,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '../utils/firebase';
 import { User } from 'firebase/auth';
 import Navbar from '../components/Navbar';
+import Alert from '../components/Alert';
 import Auth from '../components/Auth';
 
 const RootComponent = () => {
@@ -13,6 +14,7 @@ const RootComponent = () => {
     <>
       <Navbar user={user as User | null} />
       <hr />
+      {user && !user?.emailVerified && <Alert message={'email_verification'} />}
       {user ? <Outlet /> : <Auth />}
       <TanStackRouterDevtools />
     </>
