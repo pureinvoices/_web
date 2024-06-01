@@ -10,14 +10,13 @@ interface RouterContext {
   authUser: User | null;
 }
 
-const RootComponent = () => {
+const RootComponent: React.FC = () => {
   const [user] = useAuthState(auth);
 
   return (
     <>
       <Navbar />
       {user ? <Outlet /> : <Auth />}
-
       <TanStackRouterDevtools />
     </>
   );

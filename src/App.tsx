@@ -7,10 +7,9 @@ import { router } from './router';
 export default function App() {
   const [user] = useAuthState(auth);
 
-  return (
-    <RouterProvider
-      router={router}
-      context={{ authUser: user as User | null }}
-    />
-  );
+  const routerContext = {
+    authUser: user ? (user as User) : null,
+  };
+
+  return <RouterProvider router={router} context={routerContext} />;
 }
