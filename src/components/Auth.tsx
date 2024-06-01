@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useState, ReactElement } from 'react';
 import LoginForm from '@/components/LoginForm';
 import SignupForm from '@/components/SignupForm';
 
-function Auth() {
+function Auth(): ReactElement {
   const [isLogin, setIsLogin] = useState(true);
+
+  const toggleForm = (): void => {
+    setIsLogin(!isLogin);
+  };
 
   return (
     <div className="flex flex-col gap-4 p-2">
@@ -14,7 +18,8 @@ function Auth() {
           <button
             type="button"
             className="font-semibold hover:underline"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={toggleForm}
+            aria-label={isLogin ? 'Switch to sign up' : 'Switch to login'}
           >
             {isLogin ? 'Sign up' : 'Login'}
           </button>

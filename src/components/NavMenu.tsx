@@ -1,20 +1,28 @@
+import { ReactElement } from 'react';
 import { Link } from '@tanstack/react-router';
 
-const routes = ['Home', 'Profile', 'Clients', 'Items', 'Invoices'];
+const routes = [
+  { name: 'Home', path: '/' },
+  { name: 'Profile', path: '/profile' },
+  { name: 'Clients', path: '/clients' },
+  { name: 'Items', path: '/items' },
+  { name: 'Invoices', path: '/invoices' },
+];
 
-function NavMenu() {
+function NavMenu(): ReactElement {
   return (
-    <div className="flex gap-3">
-      {routes.map((route) => (
+    <nav className="flex gap-3" aria-label="Main navigation">
+      {routes.map(({ name, path }) => (
         <Link
-          key={route}
-          to={route === 'Home' ? '/' : `/${route.toLowerCase()}`}
+          key={name}
+          to={path}
           className="[&.active]:font-bold"
+          aria-current={window.location.pathname === path ? 'page' : undefined}
         >
-          {route}
+          {name}
         </Link>
       ))}
-    </div>
+    </nav>
   );
 }
 
