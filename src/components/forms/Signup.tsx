@@ -1,20 +1,15 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { auth } from '../utils/firebase';
-import { zodValidator } from '@tanstack/zod-form-adapter';
-import { z } from 'zod';
+import { collection, addDoc } from 'firebase/firestore';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { auth, db } from '../../utils/firebase';
+import { emailSchema, passwordSchema } from './validationSchema';
+import FormField from './FormField';
+import SubmitError from './SubmitError';
+import SubmitButton from './SubmitButton';
 
-const emailSchema = z.string().email({ message: 'Invalid email address' });
-const passwordSchema = z
-  .string()
-  .min(8, { message: 'At least 8 characters' })
-  .regex(/[A-Z]/, { message: 'At least one uppercase letter' })
-  .regex(/[a-z]/, { message: 'At least one lowercase letter' })
-  .regex(/[0-9]/, { message: 'At least one number' })
-  .regex(/[#?!@$%^&*-]/, { message: 'At least one special character' });
-
-export default function SignupForm() {
+export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const actionCodeSettings = {
     url: import.meta.env.VITE_EMAIL_CONFIRMED,
@@ -36,11 +31,31 @@ export default function SignupForm() {
     onSubmit: async ({ value }) => {
       if (value.password === value.password_confirm) {
         try {
-          await createUserWithEmailAndPassword(value.email, value.password);
+          const userCredential = await createUserWithEmailAndPassword(
+            value.email,
+            value.password,
+          );
+          const user = userCredential?.user;
+
+          await addDoc(collection(db, 'users'), {
+            owner: {
+              uid: user?.uid,
+              email: user?.email,
+              plan: 'free',
+            },
+            business_details: {
+              name: '',
+              address: '',
+              email: '',
+              phone: '',
+              website: '',
+            },
+            invoices: [],
+          });
+          form.reset();
         } catch (error) {
           console.error('Error creating new account:', error);
         }
-        form.reset();
       }
     },
   });
@@ -54,32 +69,14 @@ export default function SignupForm() {
           form.handleSubmit();
         }}
       >
-        <div className="mb-3 flex flex-col">
-          <form.Field
-            name="email"
-            validatorAdapter={zodValidator}
-            validators={{ onChange: emailSchema }}
-            children={(field) => (
-              <>
-                <label htmlFor={field.name}>Your Email</label>
-                <input
-                  type={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className="border bg-gray-50 p-2"
-                  placeholder="name@website.com"
-                />
-                {field.state.meta.errors ? (
-                  <em role="alert" className="text-orange-800">
-                    {field.state.meta.errors.join(', ')}
-                  </em>
-                ) : null}
-              </>
-            )}
-          />
-        </div>
+        <FormField
+          form={form}
+          name={'email'}
+          schema={emailSchema}
+          label={'Your Email'}
+          type={'email'}
+          placeholder={'name@website.com'}
+        />
         <div className="mb-3 flex flex-col">
           <form.Field
             name="password"
@@ -151,28 +148,17 @@ export default function SignupForm() {
             )}
           />
         </div>
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={`w-full bg-gray-200 py-2 ${isSubmitting ? '' : 'hover:bg-gray-300'}`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-          )}
+        <SubmitButton
+          form={form}
+          title="Create Account"
+          submittingTitle="Submitting..."
         />
       </form>
-      {error && (
-        <div>
-          <em className="text-orange-800">
-            {error.message.includes('auth/email-already-in-use')
-              ? 'This email is already in use. Please try logging in instead.'
-              : `Error: ${error.message}`}
-          </em>
-        </div>
-      )}
+      <SubmitError
+        error={error}
+        type="auth/email-already-in-use"
+        errMessage="This email is already in use. Please try logging in instead."
+      />
     </div>
   );
 }
