@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { auth } from '../utils/firebase';
+import { auth } from '../../utils/firebase';
+import { emailSchema } from './validationSchema';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { z } from 'zod';
 import {
   useSignInWithEmailAndPassword,
   useSendPasswordResetEmail,
 } from 'react-firebase-hooks/auth';
+import SubmitButton from './SubmitButton';
+import SubmitError from './SubmitError';
 
-const emailSchema = z.string().email({ message: 'Invalid email address' });
-const passwordSchema = z.string().min(1, { message: 'Invalid password' });
+const passwordSchema = z.string().min(2, { message: 'Invalid password' });
 
-export default function LoginForm() {
+export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPass, setIsForgotPass] = useState(false);
   const [passEmailSent, setPassEmailSent] = useState(false);
@@ -123,17 +125,10 @@ export default function LoginForm() {
             />
           </div>
         )}
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className={`w-full bg-gray-200 py-2 ${isSubmitting ? '' : 'hover:bg-gray-300'}`}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
-            </button>
-          )}
+        <SubmitButton
+          form={form}
+          title="Login"
+          submittingTitle="Submitting..."
         />
       </form>
       <div className="flex justify-end">
@@ -148,15 +143,11 @@ export default function LoginForm() {
           {isForgotPass ? 'Login' : 'Forgot password?'}
         </button>
       </div>
-      {error && (
-        <div>
-          <em className="text-orange-800">
-            {error.message.includes('auth/invalid-credential')
-              ? 'Invalid email or password. Please, try again.'
-              : `Error: ${error.message}`}
-          </em>
-        </div>
-      )}
+      <SubmitError
+        error={error}
+        type="auth/invalid-credential"
+        errMessage="Invalid email or password. Please, try again."
+      />
     </div>
   );
 }

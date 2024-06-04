@@ -1,6 +1,6 @@
 import { useState, ReactElement } from 'react';
-import LoginForm from '@/components/LoginForm';
-import Signup from '@/components/forms/Signup';
+import Login from '../components/forms/Login';
+import Signup from '../components/forms/Signup';
 
 function Auth(): ReactElement {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,7 +11,7 @@ function Auth(): ReactElement {
 
   return (
     <div className="flex flex-col gap-4 p-2">
-      {isLogin ? <LoginForm /> : <Signup />}
+      {isLogin ? <Login /> : <Signup />}
       <div className="mx-auto flex w-1/3">
         <p className="font-light text-gray-500">
           {isLogin ? "Don't have an account yet?" : 'Already have an account?'}{' '}
