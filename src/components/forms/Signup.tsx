@@ -1,6 +1,6 @@
 import { ReactElement, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { collection, addDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { auth, db } from '../../utils/firebase';
@@ -35,8 +35,8 @@ export default function Signup(): ReactElement {
             value.password,
           );
           const user = userCredential?.user;
-
-          await addDoc(collection(db, 'users'), {
+          const userRef = doc(db, 'users', user?.uid);
+          await setDoc(userRef, {
             owner: {
               uid: user?.uid,
               email: user?.email,
