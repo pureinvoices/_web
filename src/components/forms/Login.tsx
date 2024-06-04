@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { auth } from '../../utils/firebase';
 import { emailSchema } from './validationSchema';
@@ -13,7 +13,7 @@ import SubmitError from './SubmitError';
 
 const passwordSchema = z.string().min(2, { message: 'Invalid password' });
 
-export default function Login() {
+export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false);
   const [isForgotPass, setIsForgotPass] = useState(false);
   const [passEmailSent, setPassEmailSent] = useState(false);

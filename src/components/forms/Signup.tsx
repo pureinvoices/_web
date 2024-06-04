@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { collection, addDoc } from 'firebase/firestore';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
@@ -8,7 +8,7 @@ import { emailSchema, passwordSchema } from './validationSchema';
 import SubmitError from './SubmitError';
 import SubmitButton from './SubmitButton';
 
-export default function Signup() {
+export default function Signup(): ReactElement {
   const [showPassword, setShowPassword] = useState(false);
   const actionCodeSettings = {
     url: import.meta.env.VITE_EMAIL_CONFIRMED,
