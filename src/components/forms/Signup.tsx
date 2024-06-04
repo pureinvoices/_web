@@ -5,7 +5,6 @@ import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { zodValidator } from '@tanstack/zod-form-adapter';
 import { auth, db } from '../../utils/firebase';
 import { emailSchema, passwordSchema } from './validationSchema';
-import FormField from './FormField';
 import SubmitError from './SubmitError';
 import SubmitButton from './SubmitButton';
 
@@ -69,14 +68,32 @@ export default function Signup() {
           form.handleSubmit();
         }}
       >
-        <FormField
-          form={form}
-          name={'email'}
-          schema={emailSchema}
-          label={'Your Email'}
-          type={'email'}
-          placeholder={'name@website.com'}
-        />
+        <div className="mb-3 flex flex-col">
+          <form.Field
+            name="email"
+            validatorAdapter={zodValidator}
+            validators={{ onChange: emailSchema }}
+            children={(field) => (
+              <>
+                <label htmlFor={field.name}>Your Email</label>
+                <input
+                  type={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="border bg-gray-50 p-2"
+                  placeholder="name@website.com"
+                />
+                {field.state.meta.errors ? (
+                  <em role="alert" className="text-orange-800">
+                    {field.state.meta.errors.join(', ')}
+                  </em>
+                ) : null}
+              </>
+            )}
+          />
+        </div>
         <div className="mb-3 flex flex-col">
           <form.Field
             name="password"
