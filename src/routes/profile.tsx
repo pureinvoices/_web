@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import BusinessDetails from '../components/BusinessDetails';
+import BusinessDetails from '../components/forms/BusinessDetails';
 
 const Profile: React.FC = () => {
   return (

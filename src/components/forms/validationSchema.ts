@@ -23,7 +23,7 @@ export const businessDetails = {
     .string()
     .email({ message: 'Please enter a valid email address' }),
   websiteSchema: z.string().url({ message: 'Please enter a valid URL' }),
-  phoneNumberSchema: z.string().regex(/^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/, {
-    message: 'Phone number must be in the format (555) 123-4567',
+  phoneNumberSchema: z.string().min(10).max(18, {
+    message: 'Phone number must be at least 10 characters: (555) 123-4567',
   }),
 };
