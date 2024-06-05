@@ -56,15 +56,17 @@ We use [Commitlint](https://commitlint.js.org/) to enforce conventional commit m
 
 ## MVP Features
 
-**1. User Authentication**
+**1. User Authentication** ✅
 
-- Sign up with email and password
-- Sign in with email and password
-- Password reset functionality
+- ~~Sign up with email and password~~
+- ~~Sign in with email and password~~
+- ~~Password reset functionality~~
 
-**2. User Profile Management**
+**2. User Profile Management** 🛠️
 
+- ~~View and edit business details~~
 - View and edit user profile
+- Edit invoice template data
 - Change password
 
 **3. Invoice Management**
